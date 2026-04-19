@@ -6,6 +6,9 @@ import { getTranslations, fill, tierFeatures } from '@/lib/translate'
 export default async function Home() {
   const language = await getLanguage()
   const tr = await getTranslations(language)
+  const isEnglish = language === 'English'
+  const decorativeFont = isEnglish ? 'var(--font-playfair), Georgia, serif' : 'var(--font-geist-sans), Arial, sans-serif'
+  const decorativeLetterSpacing = isEnglish ? undefined : '0.01em'
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-950 via-blue-900 to-indigo-950 text-white">
@@ -57,7 +60,7 @@ export default async function Home() {
                 <hr className="border-[#b8cce4] mb-2" />
                 <h2
                   className="text-xl font-bold text-[#1e3a5f] mb-1"
-                  style={{ fontFamily: 'var(--font-playfair), Georgia, serif' }}
+                  style={{ fontFamily: decorativeFont, letterSpacing: decorativeLetterSpacing }}
                 >
                   Certificate of Non-Stupidity
                 </h2>
@@ -65,7 +68,7 @@ export default async function Home() {
                 <p className="text-xs italic text-gray-500 mb-2">{tr.example_cert_this_is_to}</p>
                 <p
                   className="text-3xl font-black text-[#0f1e2e] mb-1"
-                  style={{ fontFamily: 'var(--font-playfair), Georgia, serif' }}
+                  style={{ fontFamily: decorativeFont, letterSpacing: decorativeLetterSpacing, lineHeight: isEnglish ? undefined : '1.2' }}
                 >
                   YOUR NAME HERE
                 </p>
@@ -192,11 +195,19 @@ export default async function Home() {
       </section>
 
       {/* Footer */}
-        <footer className="text-sm text-center py-8">
-          <a href="/terms" className="mx-2">Terms</a>
-          <a href="/privacy" className="mx-2">Privacy</a>
-          <a href="/refunds" className="mx-2">Refunds</a>
-        </footer>
+      <footer className="border-t border-blue-800/70 mt-6 py-8">
+        <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-base font-semibold text-blue-100">
+          <a href="/terms" className="hover:text-white hover:underline underline-offset-4 transition-colors">
+            Terms
+          </a>
+          <a href="/privacy" className="hover:text-white hover:underline underline-offset-4 transition-colors">
+            Privacy
+          </a>
+          <a href="/refunds" className="hover:text-white hover:underline underline-offset-4 transition-colors">
+            Refunds
+          </a>
+        </nav>
+      </footer>
     </div>
   )
 }

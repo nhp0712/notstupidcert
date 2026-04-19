@@ -9,5 +9,5 @@ interface Props {
 export default async function CertificatePage({ searchParams }: Props) {
   const [{ _ptxn = '' }, language] = await Promise.all([searchParams, getLanguage()])
   const tr = await getTranslations(language)
-  return <CertificateView sessionId={_ptxn} tr={tr} />
+  return <CertificateView sessionId={_ptxn} tr={tr} language={language} />
 }

@@ -8,9 +8,10 @@ import type { UiStrings } from '@/lib/i18n'
 interface Props {
   sessionId: string
   tr: UiStrings
+  language: string
 }
 
-export default function CertificateView({ sessionId, tr }: Props) {
+export default function CertificateView({ sessionId, tr, language }: Props) {
   const certRef = useRef<HTMLDivElement>(null)
   const [certData, setCertData] = useState<CertificateData | null>(null)
   const [loading, setLoading] = useState(true)
@@ -126,7 +127,7 @@ export default function CertificateView({ sessionId, tr }: Props) {
           <p className="text-gray-500 text-sm">{tr.cert_success_subtitle}</p>
         </div>
 
-        {certData && <CertificateDisplay ref={certRef} data={certData} tr={tr} />}
+        {certData && <CertificateDisplay ref={certRef} data={certData} tr={tr} language={language} />}
 
         <div className="flex flex-col sm:flex-row gap-3 mt-6">
           <button

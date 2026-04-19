@@ -1,6 +1,15 @@
+import Link from "next/link"
+
 export default function TermsPage() {
   return (
     <main className="mx-auto max-w-3xl px-6 py-12">
+      <Link
+        href="/"
+        className="mb-6 inline-flex items-center gap-2 rounded-full border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100"
+      >
+        <span aria-hidden="true">←</span>
+        Back to homepage
+      </Link>
       <h1 className="text-3xl font-bold">Terms of Service</h1>
       <p className="mt-4">
         Welcome to Not Stupid Cert. By using this website and purchasing our products,

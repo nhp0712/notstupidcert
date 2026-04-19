@@ -23,6 +23,7 @@ export interface CertificateData {
 interface Props {
   data: CertificateData
   tr: UiStrings
+  language: string
 }
 
 const tierConfig = {
@@ -73,8 +74,15 @@ const tierConfig = {
   },
 }
 
-export const CertificateDisplay = forwardRef<HTMLDivElement, Props>(({ data, tr }, ref) => {
+export const CertificateDisplay = forwardRef<HTMLDivElement, Props>(({ data, tr, language }, ref) => {
   const cfg = tierConfig[data.tier]
+  const isEnglish = language === 'English'
+  const certificateFont = isEnglish
+    ? 'var(--font-playfair), Georgia, "Times New Roman", serif'
+    : 'var(--font-geist-sans), Arial, sans-serif'
+  const headingLetterSpacing = isEnglish ? '0.05em' : '0.01em'
+  const nameLetterSpacing = isEnglish ? '0.04em' : '0.01em'
+  const bodyLineHeight = isEnglish ? '1.7' : '1.85'
 
   return (
     <div
@@ -86,7 +94,7 @@ export const CertificateDisplay = forwardRef<HTMLDivElement, Props>(({ data, tr 
         maxWidth: '680px',
         width: '100%',
         margin: '0 auto',
-        fontFamily: 'var(--font-playfair), Georgia, "Times New Roman", serif',
+        fontFamily: certificateFont,
         position: 'relative',
       }}
     >
@@ -111,7 +119,7 @@ export const CertificateDisplay = forwardRef<HTMLDivElement, Props>(({ data, tr 
             {data.organization}
           </p>
           <div style={{ borderTop: `1px solid ${cfg.dividerColor}`, margin: '8px 0' }} />
-          <h1 style={{ fontSize: '22px', fontWeight: '700', color: cfg.subtitleColor, letterSpacing: '0.05em', margin: '0 0 4px' }}>
+          <h1 style={{ fontSize: '22px', fontWeight: '700', color: cfg.subtitleColor, letterSpacing: headingLetterSpacing, margin: '0 0 4px' }}>
             {data.subtitle}
           </h1>
           {data.phd && (
@@ -127,7 +135,7 @@ export const CertificateDisplay = forwardRef<HTMLDivElement, Props>(({ data, tr 
           <p style={{ fontSize: '12px', color: cfg.textColor, marginBottom: '10px', fontStyle: 'italic' }}>
             {tr.cd_this_is_to}
           </p>
-          <p style={{ fontSize: '36px', fontWeight: '900', color: cfg.nameColor, letterSpacing: '0.04em', margin: '0 0 4px', lineHeight: '1.1' }}>
+          <p style={{ fontSize: '36px', fontWeight: '900', color: cfg.nameColor, letterSpacing: nameLetterSpacing, margin: '0 0 4px', lineHeight: '1.15' }}>
             {data.name}
           </p>
           {data.title && (
@@ -135,7 +143,7 @@ export const CertificateDisplay = forwardRef<HTMLDivElement, Props>(({ data, tr 
               {data.title}
             </p>
           )}
-          <p style={{ fontSize: '13px', lineHeight: '1.7', color: cfg.textColor, maxWidth: '520px', margin: '8px auto 0' }}>
+          <p style={{ fontSize: '13px', lineHeight: bodyLineHeight, color: cfg.textColor, maxWidth: '520px', margin: '8px auto 0' }}>
             {data.mainText}
           </p>
         </div>

@@ -196,7 +196,7 @@ export const EN: UiStrings = {
   checkout_title_note: 'Claude AI will incorporate this into your certificate wording.',
   checkout_submit_btn: 'Pay {price} & Get Certified →',
   checkout_loading_btn: '⏳ Redirecting to payment...',
-  checkout_secure_note: '🔒 Secured by Stripe. We never store your card details.',
+  checkout_secure_note: '🔒 Secured by Paddle. We never store your card details.',
   checkout_included_label: "What's included",
   checkout_cancelled_msg: "😅 Payment was cancelled. Your stupidity remains uncertified... for now.",
   checkout_invalid_tier: 'Invalid tier selected.',

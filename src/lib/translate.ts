@@ -22,7 +22,7 @@ export async function getTranslations(language: string): Promise<UiStrings> {
 
 Rules:
 - Preserve {varName} placeholders exactly as-is (e.g., {price}, {name})
-- Keep brand names in English: "Certified Not Stupid™", "notstupidcert.com", "Claude AI", "Stripe", "LinkedIn", "TikTok", "Instagram"
+- Keep brand names in English: "Certified Not Stupid™", "notstupidcert.com", "Claude AI", "Paddle", "LinkedIn", "TikTok", "Instagram"
 - Keep emoji exactly as-is
 - Keep prices ($2.99 etc.) and URLs as-is
 - Return ONLY valid JSON with identical keys — no markdown, no code blocks

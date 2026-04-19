@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server'
-import Stripe from 'stripe'
+import { Paddle } from '@paddle/paddle-node-sdk'
 import Anthropic from '@anthropic-ai/sdk'
 import type { TierId } from '@/lib/tiers'
 import { certLangInstruction } from '@/lib/translate'
@@ -74,7 +74,7 @@ function extractJson(text: string): string {
 
 export async function GET(request: NextRequest) {
   try {
-    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
+    const paddle = new Paddle(process.env.PADDLE_API_KEY!)
     const anthropic = new Anthropic()
 
     const { searchParams } = new URL(request.url)
@@ -84,13 +84,14 @@ export async function GET(request: NextRequest) {
       return Response.json({ error: 'Missing session_id' }, { status: 400 })
     }
 
-    const session = await stripe.checkout.sessions.retrieve(sessionId)
+    const transaction = await paddle.transactions.get(sessionId)
 
-    if (session.payment_status !== 'paid') {
+    if (transaction.status !== 'completed') {
       return Response.json({ error: 'Payment not completed' }, { status: 402 })
     }
 
-    const { name, title = '', tier, language = 'English' } = session.metadata!
+    const customData = transaction.customData as Record<string, string>
+    const { name, title = '', tier, language = 'English' } = customData
 
     const date = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
     const certNum = `CNS-${sessionId.slice(-6).toUpperCase()}-${new Date().getFullYear()}`

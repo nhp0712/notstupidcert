@@ -1,10 +1,10 @@
 import { NextRequest } from 'next/server'
-import Stripe from 'stripe'
+import { Paddle } from '@paddle/paddle-node-sdk'
 import { getTier } from '@/lib/tiers'
 
 export async function POST(request: NextRequest) {
   try {
-    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
+    const paddle = new Paddle(process.env.PADDLE_API_KEY!)
 
     const body = await request.json()
     const { name, title, tier: tierId, language = 'English' } = body
@@ -20,31 +20,27 @@ export async function POST(request: NextRequest) {
 
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
 
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
-      mode: 'payment',
-      line_items: [{
-        price_data: {
-          currency: 'usd',
-          product_data: {
-            name: `${tier.emoji} ${tier.name}`,
-            description: `Certified Not Stupid — ${tier.tagline}`,
-          },
-          unit_amount: tier.priceInCents,
-        },
+    const transaction = await paddle.transactions.create({
+      items: [{
         quantity: 1,
+        price: {
+          description: `Certified Not Stupid — ${tier.tagline}`,
+          unitPrice: { amount: String(tier.priceInCents), currencyCode: 'USD' },
+          product: { name: `${tier.emoji} ${tier.name}`, taxCategory: 'digital-goods' },
+        },
       }],
-      metadata: {
+      customData: {
         name: name.trim(),
         title: (title || '').trim(),
         tier: tierId,
         language,
       },
-      success_url: `${appUrl}/certificate?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${appUrl}/checkout?tier=${tierId}&cancelled=true`,
+      checkout: {
+        url: `${appUrl}/certificate`,
+      },
     })
 
-    return Response.json({ url: session.url })
+    return Response.json({ url: transaction.checkout?.url })
   } catch (error) {
     console.error('Checkout session error:', error)
     return Response.json({ error: 'Failed to create checkout session' }, { status: 500 })

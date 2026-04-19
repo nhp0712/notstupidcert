@@ -192,10 +192,11 @@ export default async function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="text-center px-4 pb-8 border-t border-blue-900 pt-8">
-        <p className="text-blue-400 text-xs font-bold mb-2">{tr.footer_rights}</p>
-        <p className="text-blue-600 text-xs max-w-md mx-auto">{tr.footer_disclaimer}</p>
-      </footer>
+        <footer className="text-sm text-center py-8">
+          <a href="/terms" className="mx-2">Terms</a>
+          <a href="/privacy" className="mx-2">Privacy</a>
+          <a href="/refunds" className="mx-2">Refunds</a>
+        </footer>
     </div>
   )
 }

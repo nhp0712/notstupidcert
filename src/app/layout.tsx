@@ -5,12 +5,12 @@ import "./globals.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
-  subsets: ["latin", "latin-ext", "vietnamese"],
+  subsets: ["latin", "latin-ext"],
 });
 
 const playfair = Playfair_Display({
   variable: "--font-playfair",
-  subsets: ["latin", "latin-ext", "vietnamese"],
+  subsets: ["latin", "latin-ext"],
   weight: ["400", "500", "600", "700", "800", "900"],
   style: ["normal", "italic"],
 });

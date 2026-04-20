@@ -1,4 +1,4 @@
-// All UI strings in English. Translated dynamically by Claude for other languages.
+// All UI strings in English. Other language bundles can be added statically.
 // Strings with variables use {varName} placeholder syntax — use fill() at render time.
 
 export interface UiStrings {

@@ -1,13 +1,15 @@
 import { NextRequest } from 'next/server'
 import { Paddle } from '@paddle/paddle-node-sdk'
 import { getTier } from '@/lib/tiers'
+import { normalizeLanguage } from '@/lib/languages'
 
 export async function POST(request: NextRequest) {
   try {
     const paddle = new Paddle(process.env.PADDLE_API_KEY!)
 
     const body = await request.json()
-    const { name, title, tier: tierId, language = 'English' } = body
+    const { name, title, tier: tierId, language: rawLanguage = 'English' } = body
+    const language = normalizeLanguage(rawLanguage)
 
     if (!name?.trim() || !tierId) {
       return Response.json({ error: 'Missing required fields' }, { status: 400 })

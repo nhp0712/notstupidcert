@@ -3,6 +3,7 @@ import { Paddle } from '@paddle/paddle-node-sdk'
 import Anthropic from '@anthropic-ai/sdk'
 import type { TierId } from '@/lib/tiers'
 import { certLangInstruction } from '@/lib/translate'
+import { normalizeLanguage } from '@/lib/languages'
 
 function buildPrompt(tier: TierId, name: string, title: string, date: string, certNum: string, language: string): string {
   const titlePart = title ? `, ${title}` : ''
@@ -91,7 +92,8 @@ export async function GET(request: NextRequest) {
     }
 
     const customData = transaction.customData as Record<string, string>
-    const { name, title = '', tier, language = 'English' } = customData
+    const { name, title = '', tier, language: rawLanguage = 'English' } = customData
+    const language = normalizeLanguage(rawLanguage)
 
     const date = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
     const certNum = `CNS-${sessionId.slice(-6).toUpperCase()}-${new Date().getFullYear()}`

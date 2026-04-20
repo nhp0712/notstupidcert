@@ -1,18 +1,20 @@
 import { getTier } from '@/lib/tiers'
 import { getLanguage } from '@/lib/get-language'
 import { getTranslations, tierFeatures } from '@/lib/translate'
+import { normalizeLanguage } from '@/lib/languages'
 import CheckoutForm from './CheckoutForm'
 import Link from 'next/link'
 
 interface Props {
-  searchParams: Promise<{ tier?: string; cancelled?: string }>
+  searchParams: Promise<{ tier?: string; cancelled?: string; lang?: string }>
 }
 
 export default async function CheckoutPage({ searchParams }: Props) {
-  const [{ tier: tierId = 'basic', cancelled }, language] = await Promise.all([
+  const [{ tier: tierId = 'basic', cancelled, lang }, detectedLanguage] = await Promise.all([
     searchParams,
     getLanguage(),
   ])
+  const language = normalizeLanguage(lang ?? detectedLanguage)
 
   const [tier, tr] = await Promise.all([
     Promise.resolve(getTier(tierId)),

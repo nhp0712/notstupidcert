@@ -4,9 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "prebuild": "npm run generate:translations",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "generate:translations": "node scripts/generate-static-translations.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.90.0",

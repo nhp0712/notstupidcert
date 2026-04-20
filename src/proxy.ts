@@ -1,10 +1,14 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { getLanguageFromCountry } from './lib/country-to-language'
+import { normalizeLanguage, SUPPORTED_LANGUAGES } from './lib/languages'
 
 export function proxy(request: NextRequest) {
   // Priority: ?lang= URL param > existing cookie > Vercel geo header > Accept-Language > English
-  const urlLang = request.nextUrl.searchParams.get('lang')
+  const urlLangRaw = request.nextUrl.searchParams.get('lang')
+  const urlLang = urlLangRaw && SUPPORTED_LANGUAGES.includes(urlLangRaw as (typeof SUPPORTED_LANGUAGES)[number])
+    ? urlLangRaw
+    : null
   const cookieLang = request.cookies.get('language')?.value
   const country = request.headers.get('x-vercel-ip-country') ?? ''
   const acceptLang = request.headers.get('accept-language') ?? ''
@@ -15,13 +19,13 @@ export function proxy(request: NextRequest) {
     // Allow explicit override: ?lang=Japanese
     language = urlLang
   } else if (cookieLang) {
-    language = cookieLang
+    language = normalizeLanguage(cookieLang)
   } else if (country) {
-    language = getLanguageFromCountry(country)
+    language = normalizeLanguage(getLanguageFromCountry(country))
   } else {
     // Fallback: parse Accept-Language header (e.g., "vi-VN,vi;q=0.9" → "Vietnamese")
     const primaryLangCode = acceptLang.split(',')[0]?.split('-')[0]?.split(';')[0]?.trim() ?? ''
-    language = LANG_CODE_TO_NAME[primaryLangCode] ?? 'English'
+    language = normalizeLanguage(LANG_CODE_TO_NAME[primaryLangCode] ?? 'English')
   }
 
   // Forward to server components via request header (same-request, no round trip)

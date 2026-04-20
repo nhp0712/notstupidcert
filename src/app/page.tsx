@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { TIERS } from '@/lib/tiers'
 import { getLanguage } from '@/lib/get-language'
 import { getTranslations, fill, tierFeatures } from '@/lib/translate'
+import LanguagePicker from '@/components/LanguagePicker'
 
 export default async function Home() {
   const language = await getLanguage()
@@ -12,6 +13,14 @@ export default async function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-950 via-blue-900 to-indigo-950 text-white">
+      <div className="sticky top-0 z-30 px-4 pt-4">
+        <div className="mx-auto max-w-5xl flex justify-end">
+          <div className="rounded-xl border border-blue-700/70 bg-blue-950/70 px-3 py-2 backdrop-blur-sm">
+            <LanguagePicker currentLanguage={language} />
+          </div>
+        </div>
+      </div>
+
       {/* Hero */}
       <section className="px-4 pt-16 pb-12 text-center">
         <div className="max-w-3xl mx-auto">
@@ -143,7 +152,7 @@ export default async function Home() {
                   </ul>
 
                   <Link
-                    href={`/checkout?tier=${tier.id}`}
+                    href={`/checkout?tier=${tier.id}&lang=${encodeURIComponent(language)}`}
                     className={`w-full text-center py-3.5 rounded-xl font-bold transition-colors text-sm ${
                       tier.id === 'supreme'
                         ? 'bg-purple-600 text-white hover:bg-purple-700'

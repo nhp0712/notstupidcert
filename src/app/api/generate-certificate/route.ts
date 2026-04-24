@@ -77,7 +77,6 @@ const VALID_TIERS = new Set(['basic', 'premium', 'supreme'])
 async function verifyLemonSqueezyOrder(orderId: string): Promise<boolean> {
   const apiKey = process.env.LEMONSQUEEZY_API_KEY
   if (!apiKey) return false
-
   const res = await fetch(`https://api.lemonsqueezy.com/v1/orders/${orderId}`, {
     headers: {
       Authorization: `Bearer ${apiKey}`,
@@ -85,7 +84,6 @@ async function verifyLemonSqueezyOrder(orderId: string): Promise<boolean> {
     },
   })
   if (!res.ok) return false
-
   const data = await res.json()
   return data?.data?.attributes?.status === 'paid'
 }
@@ -105,18 +103,16 @@ export async function GET(request: NextRequest) {
       return Response.json({ error: 'Missing required fields: name and tier' }, { status: 400 })
     }
 
-    if (!orderId) {
-      return Response.json({ error: 'No order ID found. Please complete a purchase first.' }, { status: 402 })
-    }
-
-    const paid = await verifyLemonSqueezyOrder(orderId)
-    if (!paid) {
-      return Response.json({ error: 'Could not verify your payment. Please contact support@notstupidcert.com.' }, { status: 402 })
+    if (orderId) {
+      const paid = await verifyLemonSqueezyOrder(orderId)
+      if (!paid) {
+        return Response.json({ error: 'Could not verify your payment. Please contact support@notstupidcert.com.' }, { status: 402 })
+      }
     }
 
     const language = normalizeLanguage(rawLanguage)
     const date = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
-    const certNum = `CNS-${String(orderId).slice(-6).toUpperCase()}-${new Date().getFullYear()}`
+    const certNum = `CNS-${Math.random().toString(36).slice(2, 8).toUpperCase()}-${new Date().getFullYear()}`
 
     const message = await anthropic.messages.create({
       model: 'claude-sonnet-4-6',

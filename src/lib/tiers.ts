@@ -1,9 +1,11 @@
 export type TierId = 'basic' | 'premium' | 'supreme'
 
-export const LEMON_SQUEEZY_URLS: Record<TierId, string> = {
-  basic: 'https://notstupidcert.lemonsqueezy.com/checkout/buy/2eae03bd-0d84-4c31-8fce-7637b0674c07?redirect=https://notstupidcert.com/certificate',
-  premium: 'https://notstupidcert.lemonsqueezy.com/checkout/buy/4e7bafb5-f61f-4b27-bc73-3ad027f86bf1?redirect=https://notstupidcert.com/certificate',
-  supreme: 'https://notstupidcert.lemonsqueezy.com/checkout/buy/4a29e82d-bb6c-4b71-9298-fb4e5fc3acdd?redirect=https://notstupidcert.com/certificate',
+export const LEMON_SQUEEZY_STORE_ID = '355396'
+
+export const LEMON_SQUEEZY_VARIANT_IDS: Record<TierId, string> = {
+  basic: '1571024',
+  premium: '1571054',
+  supreme: '1571059',
 }
 
 export interface Tier {

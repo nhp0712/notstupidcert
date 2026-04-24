@@ -1,8 +1,9 @@
 import Image from 'next/image'
 import LanguagePicker from '@/components/LanguagePicker'
 import { getLanguage } from '@/lib/get-language'
-import { TIERS, TierId, LEMON_SQUEEZY_URLS } from '@/lib/tiers'
+import { TIERS, TierId } from '@/lib/tiers'
 import { getTranslations, tierFeatures } from '@/lib/translate'
+import Link from 'next/link'
 
 const TIER_CTAS: Record<TierId, string> = {
   basic: 'Certify Me Now →',
@@ -167,8 +168,8 @@ export default async function Home() {
                     ))}
                   </ul>
 
-                  <a
-                    href={LEMON_SQUEEZY_URLS[tier.id]}
+                  <Link
+                    href={`/checkout?tier=${tier.id}`}
                     className={`w-full block text-center py-4 rounded-xl font-black transition-colors text-base sm:text-sm ${tier.id === 'supreme'
                       ? 'bg-purple-600 text-white hover:bg-purple-700'
                       : tier.id === 'premium'
@@ -177,7 +178,7 @@ export default async function Home() {
                       }`}
                   >
                     {TIER_CTAS[tier.id]}
-                  </a>
+                  </Link>
                 </div>
               )
             })}

@@ -59,7 +59,7 @@ export default function TermsPage() {
 
       <h2 className="mt-8 text-xl font-semibold">8. Contact</h2>
       <p className="mt-2">
-        For support, please contact: harryn.0712@gmail.com
+        For support, please contact: support@notstupidcert.com
       </p>
     </main>
   )

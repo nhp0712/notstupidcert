@@ -34,7 +34,7 @@ export default function RefundsPage() {
 
       <h2 className="mt-8 text-xl font-semibold">4. Requesting a Refund</h2>
       <p className="mt-2">
-        To request a refund, contact: harryn.0712@gmail.com and include details of your order and the issue encountered.
+        To request a refund, contact: support@notstupidcert.com and include details of your order and the issue encountered.
       </p>
 
       <h2 className="mt-8 text-xl font-semibold">5. Review Time</h2>

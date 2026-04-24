@@ -52,7 +52,7 @@ export default function PrivacyPage() {
 
       <h2 className="mt-8 text-xl font-semibold">7. Contact</h2>
       <p className="mt-2">
-        For privacy-related questions, contact: harryn.0712@gmail.com
+        For privacy-related questions, contact: support@notstupidcert.com
       </p>
     </main>
   )

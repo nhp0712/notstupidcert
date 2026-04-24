@@ -151,8 +151,8 @@ function splitObjectIntoChunks(source, chunkSize = 24) {
   return chunks
 }
 
-async function translateInChunks(apiKey, english, language) {
-  const chunks = splitObjectIntoChunks(english, 24)
+async function translateInChunks(apiKey, english, language, chunkSize = 24) {
+  const chunks = splitObjectIntoChunks(english, chunkSize)
   const merged = {}
   for (let i = 0; i < chunks.length; i += 1) {
     console.log(`  chunk ${i + 1}/${chunks.length}`)
@@ -249,6 +249,8 @@ async function main() {
   const shouldForceTranslate = process.argv.includes('--force-translate') || process.env.FORCE_TRANSLATE === '1'
   const onlyArg = process.argv.find((arg) => arg.startsWith('--only='))
   const onlyLanguage = onlyArg ? onlyArg.slice('--only='.length) : ''
+  const chunkSizeArg = process.argv.find((arg) => arg.startsWith('--chunk-size='))
+  const chunkSize = chunkSizeArg ? parseInt(chunkSizeArg.slice('--chunk-size='.length), 10) : 24
   const targetLanguages = onlyLanguage ? languages.filter((lang) => lang === onlyLanguage) : languages
   if (onlyLanguage && targetLanguages.length === 0) {
     throw new Error(`Unknown language in --only: ${onlyLanguage}`)
@@ -293,7 +295,7 @@ async function main() {
 
     console.log(`Translating ${language}...`)
     try {
-      const translated = await translateInChunks(apiKey, english, language)
+      const translated = await translateInChunks(apiKey, english, language, chunkSize)
       await writeLocaleFile(language, translated)
       console.log(`Wrote ${language}`)
     } catch (err) {

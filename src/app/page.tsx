@@ -1,8 +1,42 @@
+import Image from 'next/image'
 import LanguagePicker from '@/components/LanguagePicker'
 import { getLanguage } from '@/lib/get-language'
-import { TIERS } from '@/lib/tiers'
-import { fill, getTranslations, tierFeatures } from '@/lib/translate'
-import Link from 'next/link'
+import { TIERS, TierId, LEMON_SQUEEZY_URLS } from '@/lib/tiers'
+import { getTranslations, tierFeatures } from '@/lib/translate'
+
+const TIER_CTAS: Record<TierId, string> = {
+  basic: 'Certify Me Now →',
+  premium: "I'm a Genius →",
+  supreme: 'Unlock Galaxy Brain →',
+}
+
+const TESTIMONIALS = [
+  {
+    quote: "I framed it next to my actual degree. My parents finally stopped crying.",
+    name: "Kevin L.",
+    tier: "Not Stupid Certificate",
+  },
+  {
+    quote: "My boss hasn't questioned a single decision since I put this on my desk.",
+    name: "Sarah M.",
+    tier: "Certified Genius",
+  },
+  {
+    quote: "I bought the Galaxy Brain tier. I now speak at conferences. I have no idea why they keep inviting me back.",
+    name: "James K.",
+    tier: "Galaxy Brain Supreme",
+  },
+  {
+    quote: "HR asked if this was real. I said yes. I got promoted.",
+    name: "David K.",
+    tier: "Certified Genius",
+  },
+  {
+    quote: "My IQ didn't change but my confidence absolutely did. 12/10 would certify again.",
+    name: "Tuan A.",
+    tier: "Not Stupid Certificate",
+  },
+]
 
 export default async function Home() {
   const language = await getLanguage()
@@ -45,7 +79,7 @@ export default async function Home() {
             legal, or official credential.
           </div>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-10">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-6">
             <a
               href="#tiers"
               className="w-full sm:w-auto inline-block bg-yellow-400 text-black font-black py-4 px-10 rounded-full text-lg hover:bg-yellow-300 transition-colors shadow-lg shadow-yellow-400/30"
@@ -55,64 +89,36 @@ export default async function Home() {
             <span className="text-blue-400 text-sm">{tr.hero_starting_at}</span>
           </div>
 
-          <p className="text-blue-400 text-sm italic">{tr.hero_social_proof}</p>
+          {/* Social proof counter */}
+          <div className="inline-flex items-center gap-2 bg-green-950/50 border border-green-700/40 rounded-full px-5 py-2.5 text-sm text-green-300 font-semibold">
+            <span>🧠</span>
+            <span>3,241 people officially certified so far</span>
+            <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+          </div>
         </div>
       </section>
 
-      {/* Example certificate */}
+      {/* Sample certificate image */}
       <section className="px-4 pb-16">
-        <p className="text-center text-blue-400 text-xs mb-4 font-semibold tracking-widest uppercase">
+        <p className="text-center text-blue-400 text-xs mb-6 font-semibold tracking-widest uppercase">
           {tr.example_label}
         </p>
-        <div className="max-w-lg mx-auto transform rotate-1 shadow-2xl shadow-black/50">
-          <div className="bg-white text-gray-800" style={{ border: '5px double #1e3a5f', padding: '4px' }}>
-            <div className="border-2 border-[#2d5a8a] p-6 bg-[#f8f9fc]">
-              <div className="text-center">
-                <p className="text-[10px] font-bold tracking-[0.25em] uppercase text-[#4a6fa5] mb-2">
-                  International Bureau of Human Intelligence Standards
-                </p>
-                <hr className="border-[#b8cce4] mb-2" />
-                <h2
-                  className="text-xl font-bold text-[#1e3a5f] mb-1"
-                  style={{ fontFamily: 'var(--font-playfair), Georgia, serif' }}
-                >
-                  Certificate of Non-Stupidity
-                </h2>
-                <hr className="border-[#b8cce4] mt-2 mb-4" />
-                <p className="text-xs italic text-gray-500 mb-2">{tr.example_cert_this_is_to}</p>
-                <p
-                  className="text-3xl font-black text-[#0f1e2e] mb-1"
-                  style={{ fontFamily: 'var(--font-playfair), Georgia, serif' }}
-                >
-                  Phuong Nguyen
-                </p>
-                <p className="text-xs text-[#2c3e50] max-w-xs mx-auto leading-relaxed mt-3 mb-4">
-                  {tr.example_cert_body}
-                </p>
-                <div className="flex justify-between items-end mt-4 pt-3 border-t border-[#b8cce4]">
-                  <div
-                    className="w-14 h-14 rounded-full flex items-center justify-center text-center p-2"
-                    style={{ border: '3px solid #1e3a5f' }}
-                  >
-                    <div
-                      className="w-10 h-10 rounded-full flex items-center justify-center p-1"
-                      style={{ border: '1px solid #1e3a5f' }}
-                    >
-                      <span className="text-[6px] font-black text-[#1e3a5f] leading-tight uppercase">
-                        Certified Not Stupid Official
-                      </span>
-                    </div>
-                  </div>
-                  <div className="text-right text-[10px] text-gray-500">
-                    <p>{tr.cd_issued} Today</p>
-                    <p>{tr.cd_cert_num} CNS-DEMO-2026</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+        <div
+          className="max-w-sm mx-auto shadow-2xl shadow-black/60"
+          style={{ transform: 'rotate(-1.5deg)' }}
+        >
+          <Image
+            src="/sample-certificate.png"
+            alt="Sample Certified Not Stupid certificate"
+            width={600}
+            height={800}
+            className="w-full h-auto rounded-sm"
+            priority
+          />
         </div>
-        <p className="text-center text-blue-400 text-xs mt-4">{tr.example_cert_caption}</p>
+        <p className="text-center text-blue-300 text-sm mt-6 max-w-sm mx-auto leading-relaxed">
+          Your certificate will be uniquely generated by AI. No two are the same.
+        </p>
       </section>
 
       {/* Tiers */}
@@ -161,17 +167,17 @@ export default async function Home() {
                     ))}
                   </ul>
 
-                  <Link
-                    href={`/checkout?tier=${tier.id}`}
-                    className={`w-full text-center py-3.5 rounded-xl font-bold transition-colors text-sm ${tier.id === 'supreme'
+                  <a
+                    href={LEMON_SQUEEZY_URLS[tier.id]}
+                    className={`w-full block text-center py-4 rounded-xl font-black transition-colors text-base sm:text-sm ${tier.id === 'supreme'
                       ? 'bg-purple-600 text-white hover:bg-purple-700'
                       : tier.id === 'premium'
                         ? 'bg-amber-400 text-black hover:bg-amber-500'
                         : 'bg-gray-900 text-white hover:bg-gray-700'
                       }`}
                   >
-                    {fill(tr.tiers_get_cta, { name })}
-                  </Link>
+                    {TIER_CTAS[tier.id]}
+                  </a>
                 </div>
               )
             })}
@@ -204,6 +210,36 @@ export default async function Home() {
         </div>
       </section>
 
+      {/* Testimonials */}
+      <section className="px-4 pb-20">
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-2xl sm:text-3xl font-black text-center mb-2">What People Are Saying</h2>
+          <p className="text-center text-blue-400 text-sm mb-10">Real quotes from real people*</p>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {TESTIMONIALS.map((t, i) => (
+              <div
+                key={i}
+                className="bg-blue-900/40 border border-blue-700/50 rounded-2xl p-5 flex flex-col gap-3"
+              >
+                <div className="text-yellow-400 text-sm">⭐⭐⭐⭐⭐</div>
+                <p className="text-blue-100 text-sm leading-relaxed flex-1">
+                  &ldquo;{t.quote}&rdquo;
+                </p>
+                <div className="flex items-center justify-between mt-auto pt-3 border-t border-blue-700/40">
+                  <span className="font-bold text-white text-sm">— {t.name}</span>
+                  <span className="text-xs text-blue-400 bg-blue-800/50 px-2 py-1 rounded-full">{t.tier}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <p className="text-center text-blue-600 text-xs mt-6">
+            *Verified by our verification department (us)
+          </p>
+        </div>
+      </section>
+
       {/* Final CTA */}
       <section className="px-4 pb-20 text-center">
         <div className="max-w-md mx-auto">
@@ -222,8 +258,8 @@ export default async function Home() {
       <footer className="text-sm text-center py-8 border-t border-white/10">
         <div className="mb-3 text-blue-300">
           Support:{' '}
-          <a href="mailto:harryn.0712@gmail.com" className="underline hover:text-white">
-            harryn.0712@gmail.com
+          <a href="mailto:support@notstupidcert.com" className="underline hover:text-white">
+            support@notstupidcert.com
           </a>
         </div>
         <div>

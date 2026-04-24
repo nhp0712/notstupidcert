@@ -1,5 +1,4 @@
 import { NextRequest } from 'next/server'
-import { Paddle } from '@paddle/paddle-node-sdk'
 import Anthropic from '@anthropic-ai/sdk'
 import type { TierId } from '@/lib/tiers'
 import { certLangInstruction } from '@/lib/translate'
@@ -73,37 +72,58 @@ function extractJson(text: string): string {
   return stripped.slice(start, end + 1)
 }
 
+const VALID_TIERS = new Set(['basic', 'premium', 'supreme'])
+
+async function verifyLemonSqueezyOrder(orderId: string): Promise<boolean> {
+  const apiKey = process.env.LEMONSQUEEZY_API_KEY
+  if (!apiKey) return false
+
+  const res = await fetch(`https://api.lemonsqueezy.com/v1/orders/${orderId}`, {
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      Accept: 'application/vnd.api+json',
+    },
+  })
+  if (!res.ok) return false
+
+  const data = await res.json()
+  return data?.data?.attributes?.status === 'paid'
+}
+
 export async function GET(request: NextRequest) {
   try {
-    const paddle = new Paddle(process.env.PADDLE_API_KEY!)
     const anthropic = new Anthropic()
-
     const { searchParams } = new URL(request.url)
-    const sessionId = searchParams.get('session_id')
 
-    if (!sessionId) {
-      return Response.json({ error: 'Missing session_id' }, { status: 400 })
+    const name = searchParams.get('name')?.trim()
+    const title = searchParams.get('title')?.trim() ?? ''
+    const tier = searchParams.get('tier') as TierId
+    const rawLanguage = searchParams.get('language') ?? 'English'
+    const orderId = searchParams.get('order_id')
+
+    if (!name || !tier || !VALID_TIERS.has(tier)) {
+      return Response.json({ error: 'Missing required fields: name and tier' }, { status: 400 })
     }
 
-    const transaction = await paddle.transactions.get(sessionId)
-
-    if (transaction.status !== 'completed') {
-      return Response.json({ error: 'Payment not completed' }, { status: 402 })
+    if (!orderId) {
+      return Response.json({ error: 'No order ID found. Please complete a purchase first.' }, { status: 402 })
     }
 
-    const customData = transaction.customData as Record<string, string>
-    const { name, title = '', tier, language: rawLanguage = 'English' } = customData
+    const paid = await verifyLemonSqueezyOrder(orderId)
+    if (!paid) {
+      return Response.json({ error: 'Could not verify your payment. Please contact support@notstupidcert.com.' }, { status: 402 })
+    }
+
     const language = normalizeLanguage(rawLanguage)
-
     const date = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
-    const certNum = `CNS-${sessionId.slice(-6).toUpperCase()}-${new Date().getFullYear()}`
+    const certNum = `CNS-${String(orderId).slice(-6).toUpperCase()}-${new Date().getFullYear()}`
 
     const message = await anthropic.messages.create({
       model: 'claude-sonnet-4-6',
       max_tokens: 2048,
       messages: [{
         role: 'user',
-        content: buildPrompt(tier as TierId, name, title, date, certNum, language),
+        content: buildPrompt(tier, name, title, date, certNum, language),
       }],
     })
 

@@ -1,132 +1,141 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import type { Tier } from '@/lib/tiers'
-import type { UiStrings } from '@/lib/i18n'
-import { fill } from '@/lib/i18n'
+import type { CertTypeConfig, CertTierConfig } from '@/lib/cert-types'
 
-interface Props {
-  tier: Tier
-  language: string
-  tr: UiStrings
-  tierName: string
-  tierTagline: string
-  tierFeatures: string[]
+declare global {
+  interface Window {
+    createLemonSqueezy?: () => void
+    LemonSqueezy?: {
+      Url: { Open: (url: string) => void }
+      Setup: (config: { eventHandler: (event: LsEvent) => void }) => void
+    }
+  }
 }
 
-export default function CheckoutForm({ tier, language, tr, tierName, tierTagline, tierFeatures }: Props) {
+interface LsEvent {
+  event: string
+  data?: { order?: { data?: { id?: number | string } } }
+}
+
+interface Props {
+  certType: CertTypeConfig
+  tier: CertTierConfig
+  language: string
+}
+
+export default function CheckoutForm({ certType, tier, language }: Props) {
   const [name, setName] = useState('')
   const [title, setTitle] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const accent = certType.cardAccent
+  const isDark = certType.certColors.bg.startsWith('#0') || certType.certColors.bg === '#121212'
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    if (window.createLemonSqueezy) window.createLemonSqueezy()
+
+    window.LemonSqueezy?.Setup({
+      eventHandler: (event) => {
+        if (event.event === 'Checkout.Success') {
+          const orderId = event.data?.order?.data?.id
+          sessionStorage.setItem('cert_name', name)
+          sessionStorage.setItem('cert_title', title)
+          sessionStorage.setItem('cert_tier', tier.id)
+          sessionStorage.setItem('cert_type', certType.id)
+          sessionStorage.setItem('cert_language', language)
+          if (orderId) sessionStorage.setItem('cert_order_id', String(orderId))
+          window.location.href = `/certificate?certType=${certType.id}${orderId ? `&order_id=${orderId}` : ''}`
+        }
+      },
+    })
+  }, [name, title, tier.id, certType.id, language])
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!name.trim()) return
-
     setLoading(true)
     setError('')
-
-    sessionStorage.setItem('cert_name', name.trim())
-    sessionStorage.setItem('cert_title', title.trim())
-    sessionStorage.setItem('cert_tier', tier.id)
-    sessionStorage.setItem('cert_language', language)
-
-    try {
-      const res = await fetch('/api/create-checkout-session', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: name.trim(), title: title.trim(), tier: tier.id, language }),
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Failed to create checkout')
-      window.location.href = data.url
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong.')
+    if (!window.LemonSqueezy) {
+      setError('Payment system not loaded yet. Please refresh and try again.')
       setLoading(false)
+      return
     }
+    window.LemonSqueezy.Url.Open(tier.checkoutUrl)
+    setLoading(false)
   }
 
-  const accentRing =
-    tier.id === 'supreme' ? 'focus:ring-purple-500'
-    : tier.id === 'premium' ? 'focus:ring-amber-500'
-    : 'focus:ring-blue-500'
-
-  const btnClass =
-    tier.id === 'supreme' ? 'bg-purple-600 hover:bg-purple-700 text-white'
-    : tier.id === 'premium' ? 'bg-amber-400 text-black hover:bg-amber-500'
-    : 'bg-blue-600 hover:bg-blue-700 text-white'
-
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4">
+    <div className="min-h-screen py-12 px-4" style={{ background: certType.cardBg }}>
       <div className="max-w-md mx-auto">
-        <div className="bg-white rounded-2xl shadow-lg p-8">
+        <div className="rounded-2xl shadow-2xl p-8" style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid ${accent}44` }}>
           <div className="flex items-center gap-3 mb-6">
-            <span className="text-3xl">{tier.emoji}</span>
+            <span className="text-3xl">{certType.emoji}</span>
             <div>
-              <h1 className="text-xl font-black text-gray-900">{tr.checkout_title}</h1>
-              <p className="text-gray-500 text-sm">{tierName} · {tier.price} · {tierTagline}</p>
+              <h1 className="text-xl font-black text-white">{certType.name} Certificate</h1>
+              <p className="text-sm" style={{ color: accent }}>{tier.name} · {tier.price}</p>
             </div>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-                {tr.checkout_name_label} <span className="text-red-500">*</span>
+              <label className="block text-sm font-semibold text-white/80 mb-1.5">
+                Your Name <span className="text-red-400">*</span>
               </label>
               <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder={tr.checkout_name_placeholder}
-                className={`w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 ${accentRing} focus:border-transparent outline-none transition text-gray-900`}
+                placeholder="The name to put on your certificate"
+                className="w-full px-4 py-3 border rounded-xl outline-none transition text-white placeholder-white/30 bg-white/10"
+                style={{ borderColor: `${accent}55` }}
                 maxLength={80}
                 required
               />
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-                {tr.checkout_title_label}{' '}
-                <span className="text-gray-400 font-normal">{tr.checkout_title_hint}</span>
+              <label className="block text-sm font-semibold text-white/80 mb-1.5">
+                {certType.customField.label} <span className="text-white/40 font-normal">(optional)</span>
               </label>
               <input
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder={tr.checkout_title_placeholder}
-                className={`w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 ${accentRing} focus:border-transparent outline-none transition text-gray-900`}
+                placeholder={certType.customField.placeholder}
+                className="w-full px-4 py-3 border rounded-xl outline-none transition text-white placeholder-white/30 bg-white/10"
+                style={{ borderColor: `${accent}55` }}
                 maxLength={80}
               />
-              <p className="text-xs text-gray-400 mt-1">{tr.checkout_title_note}</p>
             </div>
 
             {error && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">{error}</div>
+              <div className="p-3 bg-red-900/40 border border-red-500/50 rounded-lg text-red-300 text-sm">{error}</div>
             )}
 
             <div className="pt-2">
               <button
                 type="submit"
                 disabled={loading || !name.trim()}
-                className={`w-full ${btnClass} py-4 rounded-xl font-black text-base transition disabled:opacity-50 disabled:cursor-not-allowed`}
+                className="w-full py-4 rounded-xl font-black text-base transition disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{ background: accent, color: isDark ? '#fff' : '#000' }}
               >
-                {loading ? tr.checkout_loading_btn : fill(tr.checkout_submit_btn, { price: tier.price })}
+                {loading ? 'Opening checkout...' : `Pay ${tier.price} & Get Certified →`}
               </button>
             </div>
 
-            <p className="text-xs text-gray-400 text-center">{tr.checkout_secure_note}</p>
+            <p className="text-xs text-white/40 text-center">Secure checkout by Lemon Squeezy · Instant delivery</p>
           </form>
 
-          <div className="mt-6 pt-6 border-t border-gray-100">
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-3">
-              {tr.checkout_included_label}
-            </p>
+          <div className="mt-6 pt-6 border-t border-white/10">
+            <p className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-3">Included</p>
             <ul className="space-y-1.5">
-              {tierFeatures.map((f, i) => (
-                <li key={i} className="flex items-start gap-2 text-sm text-gray-600">
-                  <span className="text-green-500 font-bold shrink-0 mt-0.5">✓</span>
+              {tier.features.map((f, i) => (
+                <li key={i} className="flex items-start gap-2 text-sm text-white/60">
+                  <span className="font-bold shrink-0 mt-0.5" style={{ color: accent }}>✓</span>
                   {f}
                 </li>
               ))}
@@ -134,8 +143,8 @@ export default function CheckoutForm({ tier, language, tr, tierName, tierTagline
           </div>
         </div>
 
-        <p className="text-center text-sm text-gray-400 mt-6">
-          <Link href="/" className="hover:underline">{tr.checkout_back}</Link>
+        <p className="text-center text-sm text-white/40 mt-6">
+          <Link href={`/certificate/${certType.id}`} className="hover:text-white/70 transition">← Back</Link>
         </p>
       </div>
     </div>

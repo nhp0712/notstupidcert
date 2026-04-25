@@ -6,6 +6,7 @@ import { CertificateDisplay, CertificateData } from '@/components/CertificateDis
 import type { UiStrings } from '@/lib/i18n'
 
 interface Props {
+  certType: string
   orderId: string
   tr: UiStrings
   language: string
@@ -59,7 +60,7 @@ const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(({ data, tr }, ref)
 })
 ShareCard.displayName = 'ShareCard'
 
-export default function CertificateView({ orderId, tr, language }: Props) {
+export default function CertificateView({ certType: certTypeProp, orderId, tr, language }: Props) {
   const certRef = useRef<HTMLDivElement>(null)
   const shareCardRef = useRef<HTMLDivElement>(null)
   const [certData, setCertData] = useState<CertificateData | null>(null)
@@ -74,6 +75,8 @@ export default function CertificateView({ orderId, tr, language }: Props) {
     const title = sessionStorage.getItem('cert_title') ?? ''
     const tier = sessionStorage.getItem('cert_tier') ?? 'basic'
     const lang = sessionStorage.getItem('cert_language') ?? language
+    const certType = certTypeProp || sessionStorage.getItem('cert_type') || 'not-stupid'
+    const storedOrderId = sessionStorage.getItem('cert_order_id') ?? ''
 
     if (!name) {
       setError('Missing your name. Please start from the beginning.')
@@ -81,8 +84,9 @@ export default function CertificateView({ orderId, tr, language }: Props) {
       return
     }
 
-    const params = new URLSearchParams({ name, title, tier, language: lang })
-    if (orderId) params.set('order_id', orderId)
+    const params = new URLSearchParams({ name, title, tier, certType, language: lang })
+    const resolvedOrderId = orderId || storedOrderId
+    if (resolvedOrderId) params.set('order_id', resolvedOrderId)
 
     fetch(`/api/generate-certificate?${params}`)
       .then((res) => res.json())
@@ -93,7 +97,9 @@ export default function CertificateView({ orderId, tr, language }: Props) {
           sessionStorage.removeItem('cert_name')
           sessionStorage.removeItem('cert_title')
           sessionStorage.removeItem('cert_tier')
+          sessionStorage.removeItem('cert_type')
           sessionStorage.removeItem('cert_language')
+          sessionStorage.removeItem('cert_order_id')
         }
         setLoading(false)
       })

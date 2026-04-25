@@ -2,11 +2,14 @@
 
 import { forwardRef } from 'react'
 import type { UiStrings } from '@/lib/i18n'
+import type { CertTypeId } from '@/lib/cert-types'
+import { CERT_TYPES } from '@/lib/cert-types'
 
 export interface CertificateData {
   name: string
   title?: string
   tier: 'basic' | 'premium' | 'supreme'
+  certType?: CertTypeId
   date: string
   certNumber: string
   organization: string
@@ -74,8 +77,16 @@ const tierConfig = {
   },
 }
 
+function getColorConfig(certType: CertTypeId | undefined, tier: 'basic' | 'premium' | 'supreme') {
+  if (certType && certType !== 'not-stupid') {
+    const ct = CERT_TYPES.find((c) => c.id === certType)
+    if (ct) return ct.certColors
+  }
+  return tierConfig[tier]
+}
+
 export const CertificateDisplay = forwardRef<HTMLDivElement, Props>(({ data, tr, language }, ref) => {
-  const cfg = tierConfig[data.tier]
+  const cfg = getColorConfig(data.certType, data.tier)
   const isEnglish = language === 'English'
   const certificateFont = isEnglish
     ? 'var(--font-playfair), Georgia, "Times New Roman", serif'

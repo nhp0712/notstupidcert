@@ -16,9 +16,9 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Certified Not Stupid™ | Official AI-Generated Certificates",
+  title: "Certified Not Stupid™ | Official Certificates",
   description:
-    "Get an official AI-generated certificate proving you are, in fact, Not Stupid. Perfect for LinkedIn, TikTok, and framing above your desk.",
+    "Get an official certificate proving you are, in fact, Not Stupid. Perfect for LinkedIn, TikTok, and framing above your desk.",
   openGraph: {
     title: "Certified Not Stupid™",
     description: "Finally prove what your mother always knew.",
@@ -36,7 +36,11 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${playfair.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        {children}
+        {/* eslint-disable-next-line @next/next/no-sync-scripts */}
+        <script src="https://app.lemonsqueezy.com/js/lemon.js" defer></script>
+      </body>
     </html>
   );
 }

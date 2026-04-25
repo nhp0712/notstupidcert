@@ -27,7 +27,7 @@ export const TIERS: Tier[] = [
     emoji: '📜',
     features: [
       'Official-looking design',
-      'AI-generated unique funny text',
+      'Uniquely generated funny text',
       'Your name in big fancy letters',
       'Downloadable as image',
       'Shareable to socials',
@@ -42,7 +42,7 @@ export const TIERS: Tier[] = [
     highlight: true,
     features: [
       'Gold border design',
-      'Elaborate AI-generated wording',
+      'Elaborate custom-generated wording',
       'Fake impressive credentials',
       'Fake achievements & honors',
       'Your job title (elevated)',
@@ -58,7 +58,7 @@ export const TIERS: Tier[] = [
     emoji: '🧠',
     features: [
       'Most elaborate design',
-      'AI roasts everyone else as dumber',
+      'Roasts everyone else as dumber',
       'Fake PhD title',
       'Honorary memberships to made-up institutions',
       'Multiple prestigious fake awards',

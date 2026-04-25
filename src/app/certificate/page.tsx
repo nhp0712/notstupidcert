@@ -3,11 +3,11 @@ import { getTranslations } from '@/lib/translate'
 import CertificateView from './CertificateView'
 
 interface Props {
-  searchParams: Promise<{ order_id?: string }>
+  searchParams: Promise<{ certType?: string; order_id?: string }>
 }
 
 export default async function CertificatePage({ searchParams }: Props) {
-  const [{ order_id }, language] = await Promise.all([searchParams, getLanguage()])
+  const [{ certType, order_id }, language] = await Promise.all([searchParams, getLanguage()])
   const tr = await getTranslations(language)
-  return <CertificateView orderId={order_id ?? ''} tr={tr} language={language} />
+  return <CertificateView certType={certType ?? ''} orderId={order_id ?? ''} tr={tr} language={language} />
 }

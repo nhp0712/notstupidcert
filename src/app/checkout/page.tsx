@@ -1,49 +1,33 @@
-import { getTier } from '@/lib/tiers'
+import { getCertType } from '@/lib/cert-types'
+import type { TierId } from '@/lib/cert-types'
 import { getLanguage } from '@/lib/get-language'
-import { getTranslations, tierFeatures } from '@/lib/translate'
 import { normalizeLanguage } from '@/lib/languages'
 import CheckoutForm from './CheckoutForm'
 import Link from 'next/link'
 
 interface Props {
-  searchParams: Promise<{ tier?: string; lang?: string }>
+  searchParams: Promise<{ certType?: string; tier?: string; lang?: string }>
 }
 
 export default async function CheckoutPage({ searchParams }: Props) {
-  const [{ tier: tierId = 'basic', lang }, detectedLanguage] = await Promise.all([
+  const [{ certType: certTypeId = 'not-stupid', tier: tierId = 'basic', lang }, detectedLanguage] = await Promise.all([
     searchParams,
     getLanguage(),
   ])
   const language = normalizeLanguage(lang ?? detectedLanguage)
+  const certType = getCertType(certTypeId)
+  const tier = certType?.tiers.find((t) => t.id === tierId) ?? certType?.tiers[0]
 
-  const [tier, tr] = await Promise.all([
-    Promise.resolve(getTier(tierId)),
-    getTranslations(language),
-  ])
-
-  if (!tier) {
+  if (!certType || !tier) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <p className="text-gray-600 mb-4">{tr.checkout_invalid_tier}</p>
-          <Link href="/" className="text-blue-600 hover:underline">{tr.checkout_back}</Link>
+          <p className="text-gray-600 mb-4">Certificate type not found.</p>
+          <Link href="/" className="text-blue-600 hover:underline">← Back to home</Link>
         </div>
       </div>
     )
   }
 
-  const tierName = tr[`tier_${tier.id}_name` as keyof typeof tr] as string
-  const tierTagline = tr[`tier_${tier.id}_tagline` as keyof typeof tr] as string
-  const features = tierFeatures(tr, tier.id as 'basic' | 'premium' | 'supreme')
-
-  return (
-    <CheckoutForm
-      tier={tier}
-      language={language}
-      tr={tr}
-      tierName={tierName}
-      tierTagline={tierTagline}
-      tierFeatures={features}
-    />
-  )
+  return <CheckoutForm certType={certType} tier={tier} language={language} />
 }

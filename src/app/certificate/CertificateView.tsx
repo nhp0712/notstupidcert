@@ -75,13 +75,14 @@ export default function CertificateView({ orderId, tr, language }: Props) {
     const tier = sessionStorage.getItem('cert_tier') ?? 'basic'
     const lang = sessionStorage.getItem('cert_language') ?? language
 
-    if (!name || !orderId) {
-      setError(!orderId ? 'No order found. Please complete a purchase first.' : 'Missing name. Please start from the beginning.')
+    if (!name) {
+      setError('Missing your name. Please start from the beginning.')
       setLoading(false)
       return
     }
 
-    const params = new URLSearchParams({ name, title, tier, language: lang, order_id: orderId })
+    const params = new URLSearchParams({ name, title, tier, language: lang })
+    if (orderId) params.set('order_id', orderId)
 
     fetch(`/api/generate-certificate?${params}`)
       .then((res) => res.json())
